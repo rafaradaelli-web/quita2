@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0f0317;
+  --s1: #1b0725;
+  --s2: #250a31;
+  --text: #ffffff;
+  --text-muted: rgba(255,255,255,.78);
+  --primary: #8c3cf7;
+  --primary-alt: #b084ff;
+}
+html, body, #__next { height: 100%; }
+body { background: var(--bg); color: var(--text); margin: 0; }
+.card { background: var(--s1); border-radius: 1.25rem; }
+.card-2 { background: var(--s2); border-radius: 1rem; }
+.btn { background: rgba(255,255,255,.08); border-radius: 0.75rem; padding: .5rem .75rem; }
+.btn-primary { background: var(--primary); color: white; }
+.badge { background: rgba(255,255,255,.12); border-radius: .5rem; padding: .125rem .5rem; }
