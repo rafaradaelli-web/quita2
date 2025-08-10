@@ -8,6 +8,17 @@ import { tokens, CHART_COLORS, fmt, pct, levelFromXP, progressToNext, monthKeyNo
 import { recomendarEstrategia, strategyText } from "@/lib/diagnostico";
 import { PERFIS_SITUACAO, PERFIS_COMPORTAMENTO, perfilFromData, personalizedTips } from "@/lib/personalizacao";
 import { computeStreak, getAchievements, generateQuests } from "@/lib/gamificacao";
+import { supabase } from "@/lib/supabase";
+import { loadState } from "@/lib/userState";
+
+const [session, setSession] = useState(null);
+useEffect(()=>{ supabase.auth.getSession().then(({data})=>setSession(data.session));
+  const { data: sub } = supabase.auth.onAuthStateChange((_e,s)=>setSession(s));
+  return ()=> sub.subscription?.unsubscribe?.();
+},[]);
+useEffect(()=>{ const uid=session?.user?.id; if(!uid) return;
+  loadState(uid).then(s=>{ if(s?.fin) setFin(s.fin); if(s?.perfil?.preferencia) setPerfil(p=>({...p, preferencia:s.perfil.preferencia})); });
+},[session?.user?.id]);
 
 const BRAND = "Quita";
 
