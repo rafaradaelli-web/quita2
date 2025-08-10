@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
@@ -14,7 +16,7 @@ import {
 } from "@/lib/utils";
 
 import { recomendarEstrategia, strategyText } from "@/lib/diagnostico";
-import { PERFIS_SITUACAO, PERFIS_COMPORTAMENTO, perfilFromData, personalizedTips } from "@/lib/personalizacao";
+import { perfilFromData, personalizedTips } from "@/lib/personalizacao";
 import { computeStreak, getAchievements, generateQuests } from "@/lib/gamificacao";
 
 import { supabase } from "@/lib/supabase";
@@ -72,6 +74,7 @@ export default function App(){
 
   const nivel = levelFromXP(xp);
   const pnext = progressToNext(xp);
+  const progressWidth = (pnext * 100).toFixed(0) + "%";
 
   function award(pointsXP, coinsAmt){ setXP(x=> x + pointsXP); setCoins(c=> c + coinsAmt); }
   function dailyCheckin(){
@@ -115,7 +118,7 @@ export default function App(){
             <div className="hidden sm:flex items-center gap-2">
               <span>Nível {nivel}</span>
               <div className="h-2 w-32 overflow-hidden rounded bg-white/20">
-                <div className="h-full" style={{width: `${pnext*100}%`, background: tokens.primary}}/>
+                <div className="h-full" style={{ width: progressWidth, background: tokens.primary }}/>
               </div>
             </div>
           </div>
