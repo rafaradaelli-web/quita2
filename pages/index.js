@@ -20,58 +20,47 @@ import { computeStreak, getAchievements, generateQuests } from "@/lib/gamificaca
 import { supabase } from "@/lib/supabase";
 import { loadState } from "@/lib/userState";
 
-// Gráficos carregados no cliente (sem SSR) para evitar falha no build
 const Charts = dynamic(() => import("@/components/ChartsClient"), { ssr: false });
 
 const BRAND = "Quita";
 
 export default function App(){
-  // UI
   const [tab, setTab] = useState("home");
 
-  // Gamificação
   const [xp, setXP] = useState(0);
   const [coins, setCoins] = useState(0);
   const [streak, setStreak] = useState(0);
   const [lastCheckin, setLastCheckin] = useState(null);
 
-  // Sessão
   const [session, setSession] = useState(null);
 
-  // Perfil e finanças
   const [perfil, setPerfil] = useState({ nome:"", preferencia:"custo", periodicidade:"mensal" });
   const [fin, setFin] = useState({
     renda:"", despFixas:"", despVars:"", caixa:"",
     dividas:[emptyDebt()], ativos:[emptyAsset()], micro:[emptyMicro()]
   });
 
-  // Controle mensal
   const [repl, setRepl] = useState({ monthKey: monthKeyNow(), used: 0, queued:false });
 
-  // Estratégia
   const diag = useMemo(()=> recomendarEstrategia(fin), [fin]);
   const prof = useMemo(()=> perfilFromData(diag, fin, perfil.preferencia), [diag, fin, perfil.preferencia]);
 
-  // Agregados
-  const totalAtivos     = useMemo(()=> fin.ativos.reduce((s,a)=> s + (+a.valor||0), 0), [fin.ativos]);
-  const saldoDevedor    = useMemo(()=> fin.dividas.reduce((s,d)=> s + (+d.saldo||0), 0), [fin.dividas]);
-  const parcelaTotal    = useMemo(()=> fin.dividas.reduce((s,d)=> s + (+d.parcelaMensal||+d.parcela||0), 0), [fin.dividas]);
-  const patrimonio      = useMemo(()=> totalAtivos - saldoDevedor + (+fin.caixa||0), [totalAtivos, saldoDevedor, fin.caixa]);
+  const totalAtivos  = useMemo(()=> fin.ativos.reduce((s,a)=> s + (+a.valor||0), 0), [fin.ativos]);
+  const saldoDevedor = useMemo(()=> fin.dividas.reduce((s,d)=> s + (+d.saldo||0), 0), [fin.dividas]);
+  const parcelaTotal = useMemo(()=> fin.dividas.reduce((s,d)=> s + (+d.parcelaMensal||+d.parcela||0), 0), [fin.dividas]);
+  const patrimonio   = useMemo(()=> totalAtivos - saldoDevedor + (+fin.caixa||0), [totalAtivos, saldoDevedor, fin.caixa]);
 
-  // Mês novo
   useEffect(()=>{
     const cur = monthKeyNow();
     if (repl.monthKey !== cur) setRepl({ monthKey: cur, used: 0, queued:false });
   },[repl.monthKey]);
 
-  // Sessão Supabase
   useEffect(()=>{
     supabase.auth.getSession().then(({data})=> setSession(data.session));
     const { data: sub } = supabase.auth.onAuthStateChange((_e,s)=> setSession(s));
     return ()=> sub.subscription?.unsubscribe?.();
   },[]);
 
-  // Carrega estado salvo do usuário logado
   useEffect(()=>{
     const uid = session?.user?.id;
     if (!uid) return;
@@ -81,7 +70,6 @@ export default function App(){
     });
   },[session?.user?.id]);
 
-  // Níveis
   const nivel = levelFromXP(xp);
   const pnext = progressToNext(xp);
 
@@ -106,7 +94,6 @@ export default function App(){
     return "Porquinho Quita empurrando bola de neve, quitando pequenas dívidas";
   }
 
-  // Lê ?tab da URL no cliente
   useEffect(()=>{
     if (typeof window === "undefined") return;
     const url = new URL(window.location.href);
@@ -116,7 +103,6 @@ export default function App(){
 
   return (
     <div className="min-h-screen">
-      {/* HEADER */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-3 p-3">
           <div className="text-xl font-bold tracking-tight">
@@ -151,7 +137,6 @@ export default function App(){
         </nav>
       </header>
 
-      {/* HOME */}
       {tab==="home" && (
         <main className="mx-auto max-w-6xl p-4">
           <section className="relative overflow-hidden rounded-3xl p-6 card">
@@ -172,7 +157,6 @@ export default function App(){
         </main>
       )}
 
-      {/* DIAGNÓSTICO */}
       {tab==="diagnostico" && (
         <main className="mx-auto max-w-6xl p-4">
           <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -210,7 +194,6 @@ export default function App(){
         </main>
       )}
 
-      {/* TAREFAS */}
       {tab==="tarefas" && (
         <main className="mx-auto max-w-6xl p-4">
           <div className="mb-2 flex items-center justify-between">
@@ -230,7 +213,6 @@ export default function App(){
         </main>
       )}
 
-      {/* RECOMPENSAS */}
       {tab==="recompensas" && (
         <main className="mx-auto max-w-6xl p-4">
           <Card title="Conquistas">
@@ -246,7 +228,6 @@ export default function App(){
         </main>
       )}
 
-      {/* PATRIMÔNIO */}
       {tab==="patrimonio" && (
         <main className="mx-auto max-w-6xl p-4">
           <Card title="Visão geral">
@@ -260,7 +241,6 @@ export default function App(){
         </main>
       )}
 
-      {/* COACH IA */}
       {tab==="coach" && (
         <main className="mx-auto max-w-6xl p-4">
           <Card title="Coach IA (placeholder)">
@@ -272,4 +252,3 @@ export default function App(){
     </div>
   );
 }
-```
