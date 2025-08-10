@@ -1,6 +1,3 @@
-Aqui está o `pages/index.js` refeito, com gráficos carregados **apenas no cliente** (evita erro de SSR), onboarding link funcionando, e carregamento de dados do usuário quando logado no Supabase.
-
-```javascript
 import React, { useMemo, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
