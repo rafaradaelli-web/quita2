@@ -2,6 +2,9 @@ import { useState } from "react";
 import Info from "../../components/Info";
 import { Input, NumberInput, Currency, Select } from "../../components/Inputs";
 import { TIPS, METHOD_INFO, BEHAVIOR_INFO } from "../../lib/tips";
+import { supabase } from "../../lib/supabase";
+import { saveState } from "../../lib/userState";
+
 const toNum = s => +String(s||"").replace(/\./g,"").replace(",",".") || 0;
 
 export default function Onboarding(){
@@ -125,8 +128,47 @@ export default function Onboarding(){
   }}
   className="btn btn-primary text-sm"
 >
+ <button
+  onClick={async ()=>{
+    const toNum = s => +String(s||"").replace(/\./g,"").replace(",",".") || 0;
+
+    const fin = {
+      renda: toNum(renda),
+      despFixas: toNum(fixas),
+      despVars: toNum(variaveis),
+      caixa: toNum(caixa),
+      dividas: dividas.map(d=>({
+        credor: d.credor,
+        saldo: toNum(d.saldo),
+        parcela: toNum(d.parcela),
+        taxaAA: toNum(d.taxaAA),
+        atrasada: !!d.atrasada
+      })),
+      ativos: [],
+      micro: []
+    };
+    const perfil = { preferencia: prefer };
+
+    // sempre salva local
+    localStorage.setItem("quita_fin", JSON.stringify(fin));
+    localStorage.setItem("quita_perfil", JSON.stringify(perfil));
+
+    // se logado, salva no Supabase
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) await saveState(user.id, fin, perfil);
+    } catch (e) {
+      console.error("save supabase", e);
+    }
+
+    // abre já na aba Diagnóstico
+    window.location.href = "/?tab=diagnostico";
+  }}
+  className="btn btn-primary text-sm"
+>
   Concluir
 </button>
+
 
         )}
       </div>
