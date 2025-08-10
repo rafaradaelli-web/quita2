@@ -2,6 +2,7 @@ import { useState } from "react";
 import Info from "../../components/Info";
 import { Input, NumberInput, Currency, Select } from "../../components/Inputs";
 import { TIPS, METHOD_INFO, BEHAVIOR_INFO } from "../../lib/tips";
+const toNum = s => +String(s||"").replace(/\./g,"").replace(",",".") || 0;
 
 export default function Onboarding(){
   const [step, setStep] = useState(1);
@@ -100,7 +101,33 @@ export default function Onboarding(){
         {step<3 ? (
           <button onClick={()=>setStep(s=>s+1)} className="btn btn-primary text-sm">Avançar</button>
         ) : (
-          <a href="/" className="btn btn-primary text-sm">Concluir</a>
+          <button
+  onClick={()=>{
+    const fin = {
+      renda: toNum(renda),
+      despFixas: toNum(fixas),
+      despVars: toNum(variaveis),
+      caixa: toNum(caixa),
+      dividas: dividas.map(d=>({
+        credor: d.credor,
+        saldo: toNum(d.saldo),
+        parcela: toNum(d.parcela),
+        taxaAA: toNum(d.taxaAA),
+        atrasada: !!d.atrasada
+      })),
+      ativos: [],
+      micro: []
+    };
+    const perfil = { preferencia: prefer }; // "custo" | "comportamental"
+    localStorage.setItem("quita_fin", JSON.stringify(fin));
+    localStorage.setItem("quita_perfil", JSON.stringify(perfil));
+    window.location.href = "/?tab=diagnostico";
+  }}
+  className="btn btn-primary text-sm"
+>
+  Concluir
+</button>
+
         )}
       </div>
     </main>
