@@ -30,6 +30,23 @@ export default function App(){
   const patrimonio = useMemo(()=> totalAtivos - saldoDevedor + (+fin.caixa||0), [totalAtivos, saldoDevedor, fin.caixa]);
 
   useEffect(()=>{ const cur = monthKeyNow(); if (repl.monthKey !== cur){ setRepl({ monthKey: cur, used: 0, queued:false }); } }, [repl.monthKey]);
+// abrir diretamente a aba passada via ?tab=...
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  const t = new URLSearchParams(window.location.search).get("tab");
+  if (t) setTab(t);
+}, []);
+
+// carregar dados salvos pelo onboarding
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  try {
+    const f = JSON.parse(localStorage.getItem("quita_fin") || "null");
+    if (f) setFin(f);
+    const p = JSON.parse(localStorage.getItem("quita_perfil") || "null");
+    if (p?.preferencia) setPerfil(s => ({ ...s, preferencia: p.preferencia }));
+  } catch {}
+}, []);
 
   const nivel = levelFromXP(xp);
   const pnext = progressToNext(xp);
@@ -71,7 +88,7 @@ export default function App(){
                 <h1 className="text-2xl font-semibold">Saia das dívidas com método e motivação</h1>
                 <p className="mt-2 text-sm text-white/80">Diagnóstico, plano e tarefas gamificadas.</p>
                 <div className="mt-4 flex gap-2">
-                  <a href="/onboarding" className="btn btn-primary text-sm">Começar diagnóstico</a>
+                  <a href="/onboarding?next=diagnostico" className="btn btn-primary text-sm">Começar diagnóstico</a>
                   <button onClick={dailyCheckin} className="btn text-sm">Check-in diário</button>
                 </div>
               </div>
