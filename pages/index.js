@@ -71,7 +71,7 @@ export default function App(){
                 <h1 className="text-2xl font-semibold">Saia das dívidas com método e motivação</h1>
                 <p className="mt-2 text-sm text-white/80">Diagnóstico, plano e tarefas gamificadas.</p>
                 <div className="mt-4 flex gap-2">
-                  <button onClick={()=>setTab("diagnostico")} className="btn btn-primary text-sm">Começar diagnóstico</button>
+                  <a href="/onboarding" className="btn btn-primary text-sm">Começar diagnóstico</a>
                   <button onClick={dailyCheckin} className="btn text-sm">Check-in diário</button>
                 </div>
               </div>
